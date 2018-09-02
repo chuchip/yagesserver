@@ -12,24 +12,23 @@ import lombok.Data;
 
 @Data
 public class VentasAnoBean {
-	private ArrayList<VentasMesBean> ventasMes=new ArrayList<VentasMesBean>();
-	private double kilosVentaAct,impVentaAct,kilosVentaAnt,impVentaAnt;
-	
-	/**
-	 * Añade un mes y actualiza acumuladores
-	 * @param ventas
-	 */
-	public void addMes(VentasMesBean ventas)
-	{
-		ventasMes.add(ventas);
-		setKilosVentaAct(getKilosVentaAct()+ventas.getKilosVentaAct());
-		setKilosVentaAnt(getKilosVentaAnt()+ventas.getKilosVentaAnt());
-  	    setImpVentaAct(getImpVentaAct()+ventas.getImpVentaAct());
-  	    setImpVentaAnt(getImpVentaAnt()+ventas.getImpVentaAnt());
-	}
-	public double getKilosVentaDiferencia()
-	{
-		return kilosVentaAct-kilosVentaAnt;
-	}
-}
 
+    private ArrayList<VentasMesBean> ventasMes = new ArrayList();
+    private double kilosVentaAct, impVentaAct, kilosVentaAnt, impVentaAnt,gananciaAct,gananciaAnt;
+
+    /**
+     * Añade un mes y actualiza acumuladores
+     *
+     * @param ventas
+     */
+    public void addMes(VentasMesBean ventas) {
+        ventasMes.add(ventas);
+        setKilosVentaAct(getKilosVentaAct() + ventas.getKilosVentaAct());
+        setKilosVentaAnt(getKilosVentaAnt() + ventas.getKilosVentaAnt());
+        setGananciaAnt(getGananciaAnt() + ventas.getGananAct());
+        setGananciaAct(getGananciaAct() + ventas.getGananAnt());
+        setImpVentaAct(getImpVentaAct() + ventas.getImpVentaAct());
+        setImpVentaAnt(getImpVentaAnt() + ventas.getImpVentaAnt());
+    }
+ 
+}

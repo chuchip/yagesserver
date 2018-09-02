@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.Query;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import yages.util.Formatear;
 import yages.yagesserver.beans.VentasAnoBean;
 import yages.yagesserver.beans.VentasMesBean;
 import yages.yagesserver.beans.VentasSemanaBean;
-import yages.yagesserver.dao.CalendarioRepository;
+import yages.yagesserver.dao.CalendarioRepositorioService;
 import yages.yagesserver.dao.HistVentasRepository;
 import yages.yagesserver.model.Calendario;
 import yages.yagesserver.model.CalendarioKey;
@@ -34,7 +33,7 @@ import yages.yagesserver.model.HistVentasKey;
 public class YagesBussines {
 
     @Autowired
-    CalendarioRepository calendarioRepository;
+    CalendarioRepositorioService calendarioRepositorio;
 
     @Autowired
     HistVentasRepository histVentasRepository;
@@ -73,29 +72,34 @@ public class YagesBussines {
           
           List<VentasMesBean> cal =
                 jdbc.query(
-                "SELECT c.cal_ano,c.cal_mes , sum(avc_kilos) as kilosVenta "
-                    + "FROM Calendario c,  v_Albavec v "
+                "SELECT c.cal_ano,c.cal_mes , sum(hve_kilven) as kilosVenta,sum(hve_impven) as impVenta,sum(hve_impgan) as impGanancia "
+                    + "FROM Calendario c,  histventas h "
                     + " where  c.cal_ano =  ?" 
-                    + " and v.avc_fecalb between c.cal_fecini and c.cal_fecfin "
+                    + " and h.hve_fecini between c.cal_fecini and c.cal_fecfin "
+                    + " and h.hve_fecfin between c.cal_fecini and c.cal_fecfin "
                     + " group by cal_ano,cal_mes "
                     + " order by c.cal_mes",  new Object[] { ano },
-                (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_ano"),rs.getInt("cal_mes"),rs.getDouble("kilosVenta"))
+                (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_ano"),rs.getInt("cal_mes"),rs.getDouble("kilosVenta"),rs.getDouble("impVenta"),rs.getDouble("impGanancia"))
                         );
              List<VentasMesBean> calAnt =
                 jdbc.query(
-                "SELECT c.cal_ano,c.cal_mes , sum(avc_kilos) as kilosVenta "
-                    + "FROM Calendario c,  v_Albavec v "
+                "SELECT c.cal_ano,c.cal_mes , sum(hve_kilven) as kilosVenta,sum(hve_impven) as impVenta,sum(hve_impgan) as impGanancia "
+                    + "FROM Calendario c,  histventas h "
                     + " where  c.cal_ano =  ?" 
-                    + " and v.avc_fecalb between c.cal_fecini and c.cal_fecfin "
+                   + " and h.hve_fecini between c.cal_fecini and c.cal_fecfin "
+                    + " and h.hve_fecfin between c.cal_fecini and c.cal_fecfin "
                     + " group by cal_ano,cal_mes "
                     + " order by c.cal_mes",  new Object[] { ano - 1},
-                (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_ano"),rs.getInt("cal_mes"),rs.getDouble("kilosVenta"))
+                  (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_ano"),rs.getInt("cal_mes"),rs.getDouble("kilosVenta"),rs.getDouble("impVenta"),rs.getDouble("impGanancia"))
                         );
-                        
+            
+            
             for (VentasMesBean v : cal) {
                 for (VentasMesBean vAnt : calAnt) {
                     if (v.getMes() == vAnt.getMes()) {
                         v.setKilosVentaAnt(vAnt.getKilosVentaAct());
+                        v.setImpVentaAnt(vAnt.getImpVentaAct());
+                        v.setGananAnt(vAnt.getGananAct());
                     }
                 }
             }
@@ -105,8 +109,7 @@ public class YagesBussines {
 
     public ArrayList<VentasSemanaBean> getDatosSemana(int mes, int ano) {
         Calendario calAnterior = null;
-
-        Optional<Calendario> calOpc = calendarioRepository.findById(new CalendarioKey(ano - 1, mes));
+        Optional<Calendario> calOpc = calendarioRepositorio.getCalendario(new CalendarioKey( mes,ano-1));
         if (calOpc.isPresent()) {
             calAnterior = calOpc.get();
             try {
@@ -115,8 +118,9 @@ public class YagesBussines {
                 throw new VentasNotFoundException(e.getMessage(), ano, mes);
             }
         }
-        calOpc = calendarioRepository.findById(new CalendarioKey(ano, mes));
-        if (!calOpc.isPresent()) {
+        
+        calOpc = calendarioRepositorio.getCalendario(new CalendarioKey( mes,ano));
+        if (!calOpc.isPresent()) {           
             throw new VentasNotFoundException(ano, mes);
         }
         Calendario calActual = calOpc.get();
@@ -125,19 +129,20 @@ public class YagesBussines {
         } catch (ParseException e) {
             throw new VentasNotFoundException(e.getMessage(), ano, mes);
         }
+    
+        ArrayList<HistVentas> histVentActual = new ArrayList();
+        ArrayList<HistVentas> histVentAnt = new ArrayList();
 
-        ArrayList<HistVentas> histVentActual = new ArrayList<HistVentas>();
-        ArrayList<HistVentas> histVentAnt = new ArrayList<HistVentas>();
-
-        while (Formatear.comparaFechas(calActual.getFechaInicio(), calActual.getFechaFinal()) <= 0) {
-
+        while (Formatear.comparaFechas(calActual.getFechaInicio(), calActual.getFechaFinal()) <= 0) 
+        {
             if (Formatear.comparaFechas(calActual.getFechaFinalSemana(), calActual.getFechaFinal()) > 0 && mes == 12) {
                 calActual.setFechaFinalSemana(calActual.getFechaFinal());
             }
             histVentActual.add(addSemana(calActual.getFechaInicio(), calActual.getFechaFinalSemana()));
             incrementaSemana(calActual);
 
-            if (calAnterior.getFechaInicio() != null && Formatear.comparaFechas(calAnterior.getFechaInicio(), calAnterior.getFechaFinal()) <= 0) {
+            if (calAnterior != null && Formatear.comparaFechas(calAnterior.getFechaInicio(), calAnterior.getFechaFinal()) <= 0) 
+            {
                 if (Formatear.comparaFechas(calAnterior.getFechaFinalSemana(), calAnterior.getFechaFinal()) > 0 && mes == 12) {
                     calAnterior.setFechaFinalSemana(calAnterior.getFechaFinal());
                 }
@@ -148,12 +153,12 @@ public class YagesBussines {
             }
         } // Fin de bucle
 
-        if (calAnterior.getFechaInicio() != null && Formatear.comparaFechas(calAnterior.getFechaInicio(), calAnterior.getFechaFinal()) < 0) {
+        if (calAnterior != null && Formatear.comparaFechas(calAnterior.getFechaInicio(), calAnterior.getFechaFinal()) < 0) {
             histVentActual.add(null);
             histVentAnt.add(addSemana(calAnterior.getFechaInicio(), calAnterior.getFechaFinalSemana()));
         }
         int n = 0;
-        ArrayList<VentasSemanaBean> ventasSemana = new ArrayList<VentasSemanaBean>();
+        ArrayList<VentasSemanaBean> ventasSemana = new ArrayList();
         for (HistVentas hVen : histVentActual) {
             HistVentas hVenAnt = histVentAnt.get(n);
             VentasSemanaBean vSem = new VentasSemanaBean();
@@ -161,14 +166,16 @@ public class YagesBussines {
             if (hVen != null) {
                 vSem.setFechaInicioAct(hVen.getHistVentasKey().getFechaInicio());
                 vSem.setFechaFinalAct(hVen.getHistVentasKey().getFechaFinal());
-                vSem.setKilosVentaAct(Formatear.format(hVen.getKilosVenta(), "-,---,--9"));
-                vSem.setImpVentaAct(Formatear.format(hVen.getImporteVenta(), "--,---,--9"));
+                vSem.setKilosVentaAct(hVen.getKilosVenta());
+                vSem.setImpVentaAct(hVen.getImporteVenta());
+                vSem.setImpGanaAct(hVen.getImporteGanancia());
             }
             if (hVenAnt != null) {
                 vSem.setFechaInicioAnt(hVenAnt.getHistVentasKey().getFechaInicio());
                 vSem.setFechaFinalAnt(hVenAnt.getHistVentasKey().getFechaFinal());
-                vSem.setKilosVentaAnt(Formatear.format(hVenAnt.getKilosVenta(), "-,---,--9"));
-                vSem.setImpVentaAnt(Formatear.format(hVenAnt.getImporteVenta(), "--,---,--9"));
+                vSem.setKilosVentaAnt(hVenAnt.getKilosVenta());
+                vSem.setImpVentaAnt(hVenAnt.getImporteVenta());
+                vSem.setImpGanaAnt(hVenAnt.getImporteGanancia());
             }
             ventasSemana.add(vSem);
             n++;
@@ -189,7 +196,12 @@ public class YagesBussines {
             cal.setFechaFinalSemana(cal.getFechaFinal());
         }
     }
-
+    /**
+     * Añade semana con los kilos sacados del Repositorio  (histVentasRepository)
+     * @param fecIni
+     * @param fecFin
+     * @return 
+     */
     HistVentas addSemana(java.util.Date fecIni, java.util.Date fecFin) {
         if (Formatear.comparaFechas(fecIni, fecFin) > 0) {
             return null;
@@ -201,7 +213,6 @@ public class YagesBussines {
         } else {
             return new HistVentas(new HistVentasKey(fecIni, fecFin));
         }
-
     }
 
     /**

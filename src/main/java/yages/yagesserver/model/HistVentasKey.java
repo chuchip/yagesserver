@@ -6,10 +6,16 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Temporal;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Setter;
 import lombok.Getter;
-@Embeddable
 
+@Data
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class HistVentasKey implements Serializable  {
 
 	 private static final long serialVersionUID = 1L;
@@ -24,14 +30,15 @@ public class HistVentasKey implements Serializable  {
 
 	 @Column(name = "div_codi", columnDefinition="int default 1", nullable = false)
 	 @Setter @Getter private int divisa;
+         
 	 public HistVentasKey(Date fecInicio,Date fecFinal)
 	 {
 		this(fecInicio, fecFinal, 0);
 	 }
-	 public HistVentasKey(Date fecInicio,Date fecFinal, int divCodi)
-	 {
-		 fechaInicio=fecInicio;
-		 FechaFinal=fecFinal;
-		 divisa=divCodi;
-	 }
+//	 public HistVentasKey(Date fecInicio,Date fecFinal, int divCodi)
+//	 {
+//		 fechaInicio=fecInicio;
+//		 FechaFinal=fecFinal;
+//		 divisa=divCodi;
+//	 }
 }

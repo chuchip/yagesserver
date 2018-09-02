@@ -11,5 +11,5 @@ import lombok.Data;
 public class VentasSemanaBean {
 		
 	private java.util.Date fechaInicioAct,fechaFinalAct, fechaInicioAnt,fechaFinalAnt;
-	private String kilosVentaAct,impVentaAct,kilosVentaAnt,impVentaAnt;
+	private double kilosVentaAct,impVentaAct,kilosVentaAnt,impVentaAnt, impGanaAct,impGanaAnt;
 }

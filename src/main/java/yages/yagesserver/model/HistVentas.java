@@ -9,10 +9,14 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Setter;
 
 @Entity 
-@Table(name="histventas",schema="anjelica")
+@Table(name="histventas")
+@NoArgsConstructor
+@AllArgsConstructor
 public class HistVentas  implements Serializable{	
 	 private static final long serialVersionUID = 1L;
 
@@ -24,25 +28,13 @@ public class HistVentas  implements Serializable{
 	 
 	 @Column(name = "hve_impgan")
 	 @Setter @Getter private double importeGanancia;
-	 	 
-	 @Column(name = "hve_kiveav")
-	 @Setter @Getter private double kilosVentaArtVend;
-	 
-	 @Column(name = "hve_imveav")
-	 @Setter @Getter private double importeVentaArtVend;
+	 	 	
 	 
 	 @EmbeddedId
 	 @Setter @Getter private HistVentasKey histVentasKey;
-	 
-	 @Transient 
-	 @Setter @Getter private int ano;
-	 
-	 public HistVentas() {
-
-	 }
+	 	
 	 public HistVentas(HistVentasKey hVentasKey)
 	 {
-		 histVentasKey=hVentasKey;
-		 
+		 histVentasKey=hVentasKey;		 
 	 }
 }
