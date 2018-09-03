@@ -1,4 +1,4 @@
-drop table calendario;
+-- drop table calendario;
 create table calendario
 (
 	cal_ano int,  -- Año
@@ -7,7 +7,7 @@ create table calendario
 	cal_fecfin date,  -- Fecha Final.
 	constraint ix_calendario primary  key (cal_ano,cal_mes)
 );
-drop table histventas;
+-- drop table histventas;
 create table histventas
 (
     hve_fecini date not null, -- Fecha Inicial

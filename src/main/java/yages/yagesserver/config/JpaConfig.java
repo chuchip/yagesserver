@@ -1,19 +1,11 @@
 package yages.yagesserver.config;
 
-/**
- *
- * @author chuchip
- */
-
-import java.util.HashMap;
-import java.util.Map;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -30,7 +22,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableJpaRepositories("yages.yagesserver")
 @EnableTransactionManagement
-
 public class JpaConfig {
    
     @Bean
@@ -54,7 +45,7 @@ public class JpaConfig {
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) throws NamingException {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource());              
+        em.setDataSource(dataSource);              
       
         em.setPackagesToScan(new String[]{"yages.yagesserver", "yages.yagesserver.dao"});
         em.setPersistenceUnitName("yages-server");
@@ -62,8 +53,7 @@ public class JpaConfig {
         em.afterPropertiesSet();
         return em;
     }
-   
-    
+       
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
@@ -74,12 +64,10 @@ public class JpaConfig {
         return jpaVendorAdapter;
     }    
    
-
     @Bean
     public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(emf);
         return transactionManager;
     }
-
 }
