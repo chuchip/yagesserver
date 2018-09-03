@@ -1,9 +1,5 @@
 package yages.yagesserver.config;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.annotation.WebServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class YagesInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
