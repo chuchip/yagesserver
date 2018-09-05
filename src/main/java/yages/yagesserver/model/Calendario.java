@@ -8,30 +8,29 @@ import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.persistence.Table;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Entity 
 @Table(name="calendario")
 @NoArgsConstructor
+@Data	
 public class Calendario implements Serializable{		
-	    @Getter private static final long serialVersionUID = 1L;
+	    private static final long serialVersionUID = 1L;
             
             @Column(name = "cal_fecini",nullable = false)
 	    @Temporal(javax.persistence.TemporalType.DATE)
-	    @Setter @Getter private Date fechaInicio;
+	    private Date fechaInicio;
 		
 	    @Column(name = "cal_fecfin",nullable = false)
 	    @Temporal(javax.persistence.TemporalType.DATE)
-	    @Setter @Getter private Date fechaFinal;
+	    private Date fechaFinal;
 	    
 	    @Transient
-	    @Setter @Getter private Date fechaFinalSemana;
+	    private Date fechaFinalSemana;
 	    	 
             @EmbeddedId
-	    @Setter @Getter private CalendarioKey calendarioKey;
+	    private CalendarioKey calendarioKey;
             
 	    public Calendario(int ano,int mes,Date fecInicio,Date fecFinal)
 	    {

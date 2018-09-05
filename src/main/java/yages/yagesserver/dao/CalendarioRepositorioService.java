@@ -7,10 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import yages.yagesserver.model.Calendario;
 import yages.yagesserver.model.CalendarioKey;
 
-/**
- *
- * @author chuchip
- */
 @Service
 @Transactional
 public class CalendarioRepositorioService {

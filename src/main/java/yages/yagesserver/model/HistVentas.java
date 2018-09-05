@@ -6,19 +6,20 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Setter;
 
 @Entity 
+@Data
 @Table(name="histventas")
 @NoArgsConstructor
 @AllArgsConstructor
 public class HistVentas  implements Serializable{	
-	 private static final long serialVersionUID = 1L;
+	 @Getter private static final long serialVersionUID = 1L;
 
 	 @Column(name = "hve_kilven")
 	 @Setter @Getter private double kilosVenta;
