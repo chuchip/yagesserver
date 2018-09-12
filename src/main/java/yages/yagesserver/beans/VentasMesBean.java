@@ -5,17 +5,15 @@ import lombok.Data;
 @Data
 public class VentasMesBean {
 
-    private int ano, mes;
+    private int  mes;
     private double kilosVentaAct, impVentaAct, kilosVentaAnt, impVentaAnt;
     private double gananAct, gananAnt;
 
-    public VentasMesBean(int ano, int mes) {
-        setAno(ano);
+    public VentasMesBean(int mes) {
         setMes(mes);
     }
 
-    public VentasMesBean(int ano, int mes, double kilosVenta, double impVenta, double ganancia) {
-        setAno(ano);
+    public VentasMesBean( int mes, double kilosVenta, double impVenta, double ganancia) {        
         setMes(mes);
         setKilosVentaAct(kilosVenta);
         setImpVentaAct(impVenta);

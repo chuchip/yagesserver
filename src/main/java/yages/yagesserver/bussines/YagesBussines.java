@@ -72,7 +72,7 @@ public class YagesBussines {
                         + " and h.hve_fecfin between c.cal_fecini and c.cal_fecfin "
                         + " group by cal_ano,cal_mes "
                         + " order by c.cal_mes", new Object[]{ano},
-                        (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_ano"), rs.getInt("cal_mes"), rs.getDouble("kilosVenta"), rs.getDouble("impVenta"), rs.getDouble("impGanancia"))
+                        (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_mes"), rs.getDouble("kilosVenta"), rs.getDouble("impVenta"), rs.getDouble("impGanancia"))
                 );
         List<VentasMesBean> calAnt
                 = jdbc.query(
@@ -83,7 +83,7 @@ public class YagesBussines {
                         + " and h.hve_fecfin between c.cal_fecini and c.cal_fecfin "
                         + " group by cal_ano,cal_mes "
                         + " order by c.cal_mes", new Object[]{ano - 1},
-                        (rs, rowNum) -> new VentasMesBean(rs.getInt("cal_ano"), rs.getInt("cal_mes"), rs.getDouble("kilosVenta"), rs.getDouble("impVenta"), rs.getDouble("impGanancia"))
+                        (rs, rowNum) -> new VentasMesBean( rs.getInt("cal_mes"), rs.getDouble("kilosVenta"), rs.getDouble("impVenta"), rs.getDouble("impGanancia"))
                 );
         cal.forEach(v -> 
         {
