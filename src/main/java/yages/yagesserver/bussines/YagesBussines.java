@@ -28,7 +28,7 @@ import yages.yagesserver.model.HistVentasKey;
 @Component
 @NoArgsConstructor
 public class YagesBussines {
-
+    double kilosTotal;
     @Autowired
     CalendarioRepositorioService calendarioRepositorio;
 
@@ -49,11 +49,13 @@ public class YagesBussines {
     public VentasAnoBean getVentasAno(int ano) {
         List<VentasMesBean> cal = getKilosPorMes(ano);
         VentasAnoBean ventasAno = new VentasAnoBean();
+        kilosTotal=0;
         cal.forEach((v) -> {
+            kilosTotal+=v.getKilosVentaAct();
             ventasAno.addMes(v);
         });
 
-        if (ventasAno.getKilosVentaAct() == 0) {
+        if (kilosTotal == 0) {
             throw new VentasNotFoundException(ano);
         }
         return ventasAno;
